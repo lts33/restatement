@@ -5,6 +5,7 @@ function FileUpload() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [apiKey, setApiKey] = useState('');
+  const [modelName, setModelName] = useState('gemini-2.5-flash');
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,6 +27,10 @@ function FileUpload() {
 
   const handleApiKeyChange = (event) => {
     setApiKey(event.target.value);
+  };
+
+  const handleModelNameChange = (event) => {
+    setModelName(event.target.value);
   };
 
   const fileToGenerativePart = async (file) => {
@@ -54,7 +59,7 @@ function FileUpload() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+      const model = genAI.getGenerativeModel({ model: modelName });
 
       const imagePart = await fileToGenerativePart(selectedFile);
       const prompt = `Analyze this image/document. It is a bank statement (likely Amex).
@@ -87,7 +92,7 @@ function FileUpload() {
 
     } catch (err) {
       console.error("Gemini API Error:", err);
-      setError(`Error processing file: ${err.message}`);
+      setError(`Error processing file with model '${modelName}': ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -97,20 +102,38 @@ function FileUpload() {
     <div style={styles.container}>
       <h2>Bank Statement Upload & Process</h2>
 
-      <div style={styles.inputGroup}>
-        <label style={styles.label}>
-            Gemini API Key:
-            <input
-                type="password"
-                value={apiKey}
-                onChange={handleApiKeyChange}
-                placeholder="Enter your API Key"
-                style={styles.textInput}
-            />
-        </label>
-        <p style={styles.helperText}>
-            You can get an API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">Google AI Studio</a>.
-        </p>
+      <div style={styles.configSection}>
+        <div style={styles.inputGroup}>
+            <label style={styles.label}>
+                Gemini API Key:
+                <input
+                    type="password"
+                    value={apiKey}
+                    onChange={handleApiKeyChange}
+                    placeholder="Enter your API Key"
+                    style={styles.textInput}
+                />
+            </label>
+            <p style={styles.helperText}>
+                You can get an API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">Google AI Studio</a>.
+            </p>
+        </div>
+
+        <div style={styles.inputGroup}>
+            <label style={styles.label}>
+                Model Name:
+                <input
+                    type="text"
+                    value={modelName}
+                    onChange={handleModelNameChange}
+                    placeholder="e.g. gemini-2.5-flash"
+                    style={styles.textInput}
+                />
+            </label>
+            <p style={styles.helperText}>
+                Default is <code>gemini-2.5-flash</code>. Try <code>gemini-1.5-flash</code> or <code>gemini-pro</code> if this doesn't work.
+            </p>
+        </div>
       </div>
 
       <div style={styles.uploadSection}>
@@ -187,9 +210,16 @@ const styles = {
     textAlign: 'center',
     fontFamily: 'Arial, sans-serif'
   },
-  inputGroup: {
+  configSection: {
+      textAlign: 'left',
       marginBottom: '20px',
-      textAlign: 'left'
+      padding: '15px',
+      border: '1px solid #eee',
+      borderRadius: '8px',
+      backgroundColor: '#fafafa'
+  },
+  inputGroup: {
+      marginBottom: '15px',
   },
   label: {
       display: 'block',
@@ -200,12 +230,15 @@ const styles = {
       width: '100%',
       padding: '8px',
       marginTop: '5px',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      borderRadius: '4px',
+      border: '1px solid #ccc'
   },
   helperText: {
       fontSize: '0.85em',
       color: '#666',
-      marginTop: '5px'
+      marginTop: '5px',
+      margin: '0'
   },
   uploadSection: {
     marginBottom: '20px',
@@ -239,7 +272,11 @@ const styles = {
   error: {
       color: 'red',
       marginBottom: '15px',
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      padding: '10px',
+      border: '1px solid red',
+      borderRadius: '5px',
+      backgroundColor: '#fff0f0'
   },
   resultsSection: {
       marginBottom: '20px'
