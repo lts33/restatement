@@ -54,7 +54,7 @@ function FileUpload() {
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
       const imagePart = await fileToGenerativePart(selectedFile);
       const prompt = `Analyze this image/document. It is a bank statement (likely Amex).
